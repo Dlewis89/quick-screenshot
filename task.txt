@@ -1,7 +1,0 @@
-[x] Create Window
-[x] Create a drop down list
-[x] Find out how to get list of open windows
-[x] Populate the drop down list with windows 
-[x] Create a button to take screen
-[x] Screen shot the selected windows
-[x] save the screen shot as a png file

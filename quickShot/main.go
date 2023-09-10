@@ -2,12 +2,9 @@ package main
 
 import (
 	"fmt"
-	"image"
 	"image/png"
 	"log"
 	"os"
-	"strconv"
-	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -16,22 +13,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/kbinani/screenshot"
 )
-
-type Display struct {
-	name   string
-	index  int
-	bounds image.Rectangle
-}
-
-func getDisplayNames(displays []Display) []string {
-	var displayNames []string
-
-	for i := 0; i < len(displays); i++ {
-		displayNames = append(displayNames, displays[i].name)
-	}
-
-	return displayNames
-}
 
 func takeScreenshot(displays []Display, selectedScreen string) {
 	for i := 0; i < len(displays); i++ {
@@ -45,7 +26,7 @@ func takeScreenshot(displays []Display, selectedScreen string) {
 			log.Fatal("Unable to get bounds of requested display", err)
 		}
 
-		fileName := "screenshot_" + strconv.FormatInt(time.Now().Unix(), 10) + ".png"
+		fileName := CreateDisplayName()
 
 		file, err := os.Create(fileName)
 
@@ -67,13 +48,9 @@ func main() {
 
 	myWindow.Resize(fyne.NewSize(300, 200))
 
-	var displays []Display
+	displays := GetDisplays()
 
-	for i := 0; i < screenshot.NumActiveDisplays(); i++ {
-		displays = append(displays, Display{"screen " + strconv.Itoa(i), i, screenshot.GetDisplayBounds(i)})
-	}
-
-	displaySelector := widget.NewSelect(getDisplayNames(displays), func(value string) {
+	displaySelector := widget.NewSelect(GetDisplayNames(displays), func(value string) {
 		fmt.Println("Screen " + value + " selected")
 	})
 
