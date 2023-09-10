@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/png"
 	"log"
@@ -17,40 +18,18 @@ import (
 )
 
 type Display struct {
-	name  string
-	index int
+	name   string
+	index  int
+	bounds image.Rectangle
 }
 
-func main() {
-
-	myApp := app.New()
-	myWindow := myApp.NewWindow("Quick ScreenShot")
-
-	myWindow.Resize(fyne.NewSize(300, 200))
-
-	var bounds image.Rectangle
-	var displays []Display
-
-	for i := 0; i < screenshot.NumActiveDisplays(); i++ {
-		displays = append(displays, Display{"screen " + strconv.Itoa(i), i})
-	}
-
-	var displayNames []string
-
+func takeScreenshot(displays []Display, selectedScreen string) {
 	for i := 0; i < len(displays); i++ {
-		displayNames = append(displayNames, displays[i].name)
-	}
-
-	displaySelector := widget.NewSelect(displayNames, func(value string) {
-		for i := 0; i < len(displays); i++ {
-			if displays[i].name == value {
-				bounds = screenshot.GetDisplayBounds(i)
-			}
+		if displays[i].name != selectedScreen {
+			continue
 		}
-	})
 
-	screenshotButton := widget.NewButton("Take screenshot", func() {
-		img, err := screenshot.CaptureRect(bounds)
+		img, err := screenshot.CaptureRect(displays[i].bounds)
 
 		if err != nil {
 			log.Fatal("Unable to get bounds of requested display", err)
@@ -61,12 +40,41 @@ func main() {
 		file, err := os.Create(fileName)
 
 		if err != nil {
-			log.Fatal("Unable to create file from display bounds", err)
+			log.Fatal("Unable to create file", err)
 		}
 
 		defer file.Close()
 
 		png.Encode(file, img)
+
+	}
+}
+
+func main() {
+
+	myApp := app.New()
+	myWindow := myApp.NewWindow("Quick ScreenShot")
+
+	myWindow.Resize(fyne.NewSize(300, 200))
+
+	var displays []Display
+
+	for i := 0; i < screenshot.NumActiveDisplays(); i++ {
+		displays = append(displays, Display{"screen " + strconv.Itoa(i), i, screenshot.GetDisplayBounds(i)})
+	}
+
+	var displayNames []string
+
+	for i := 0; i < len(displays); i++ {
+		displayNames = append(displayNames, displays[i].name)
+	}
+
+	displaySelector := widget.NewSelect(displayNames, func(value string) {
+		fmt.Println("Screen " + value + " selected")
+	})
+
+	screenshotButton := widget.NewButton("Take screenshot", func() {
+		takeScreenshot(displays, displaySelector.Selected)
 	})
 
 	displayOptionsListContainer := container.New(layout.NewHBoxLayout(), layout.NewSpacer(), displaySelector, layout.NewSpacer())
