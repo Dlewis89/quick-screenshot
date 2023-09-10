@@ -11,22 +11,23 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dlewis89/go-screenshot/display"
 	"github.com/kbinani/screenshot"
 )
 
-func takeScreenshot(displays []Display, selectedScreen string) {
+func takeScreenshot(displays []display.Display, selectedScreen string) {
 	for i := 0; i < len(displays); i++ {
-		if displays[i].name != selectedScreen {
+		if displays[i].GetName() != selectedScreen {
 			continue
 		}
 
-		img, err := screenshot.CaptureRect(displays[i].bounds)
+		img, err := screenshot.CaptureRect(displays[i].GetBounds())
 
 		if err != nil {
 			log.Fatal("Unable to get bounds of requested display", err)
 		}
 
-		fileName := CreateDisplayName()
+		fileName := display.CreateDisplayName()
 
 		file, err := os.Create(fileName)
 
@@ -48,10 +49,10 @@ func main() {
 
 	myWindow.Resize(fyne.NewSize(300, 200))
 
-	displays := GetDisplays()
+	displays := display.GetDisplays()
 
-	displaySelector := widget.NewSelect(GetDisplayNames(displays), func(value string) {
-		fmt.Println("Screen " + value + " selected")
+	displaySelector := widget.NewSelect(display.GetDisplayNames(displays), func(value string) {
+		fmt.Println(value + " selected")
 	})
 
 	screenshotButton := widget.NewButton("Take screenshot", func() {
