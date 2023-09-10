@@ -23,7 +23,7 @@ type Display struct {
 	bounds image.Rectangle
 }
 
-func getListOfDisplayNames(displays []Display) []string {
+func getDisplayNames(displays []Display) []string {
 	var displayNames []string
 
 	for i := 0; i < len(displays); i++ {
@@ -73,7 +73,7 @@ func main() {
 		displays = append(displays, Display{"screen " + strconv.Itoa(i), i, screenshot.GetDisplayBounds(i)})
 	}
 
-	displaySelector := widget.NewSelect(getListOfDisplayNames(displays), func(value string) {
+	displaySelector := widget.NewSelect(getDisplayNames(displays), func(value string) {
 		fmt.Println("Screen " + value + " selected")
 	})
 
