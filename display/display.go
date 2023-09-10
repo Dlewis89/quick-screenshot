@@ -14,6 +14,14 @@ type Display struct {
 	bounds image.Rectangle
 }
 
+func (d *Display) GetName() string {
+	return d.name
+}
+
+func (d *Display) GetBounds() image.Rectangle {
+	return d.bounds
+}
+
 func GetDisplays() []Display {
 	var displays []Display
 
